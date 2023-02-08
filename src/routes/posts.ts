@@ -1,7 +1,11 @@
-import Router from 'express'
+import Router from "express";
 export const postRoute = Router.Router();
-import {verify} from './verifyToken.js'
+import { verifyAccessToken } from "../helpers/jwt_helper.js";
+// import { verify } from "./verifyToken.js";
+import multer from 'multer'
 
-postRoute.get('/',verify, (req,res) => {
-  res.send(req.user)
-})
+postRoute.get("/", verifyAccessToken, (req, res) => {
+  res.send(req.user);
+});
+
+postRoute.post("/")
