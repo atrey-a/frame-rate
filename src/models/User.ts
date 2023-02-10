@@ -20,22 +20,26 @@ const userSchema = new mongoose.Schema({
     min: 8,
     max: 1024,
   },
-  date: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
   followers: {
-    type:Array,
-    default: []
+    type: Array<String>,
+    default: [],
   },
   following: {
-    type:Array,
-    default: []
+    type: Array<String>,
+    default: [],
   },
   posts: {
-    type: Array<typeof Post>,
-    default: []
-  }
+    type: Array<String>,
+    default: [],
+  },
+  saved: {
+    type: Array<String>,
+    default: [],
+  },
 });
 
 export const User = mongoose.model("User", userSchema);

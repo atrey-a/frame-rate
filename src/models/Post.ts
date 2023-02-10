@@ -3,24 +3,24 @@ import mongoose from "mongoose";
 const postSchema = new mongoose.Schema({
   userId: {
     type: String,
-    required: true
+    required: true,
   },
   caption: {
     type: String,
-    max: 120
+    max: 120,
   },
-  image: {
+  imageId: {
     type: String,
-    required: true
+    required: true,
   },
   likes: {
     type: Array<String>,
-    default: []
+    default: [],
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
-})
+    default: Date.now,
+  },
+});
 
 export const Post = mongoose.model("Post", postSchema);

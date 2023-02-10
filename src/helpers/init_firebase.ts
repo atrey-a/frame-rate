@@ -14,11 +14,11 @@ export const firebaseConfig = {
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID,
-  measurementId: process.env.FIREBASE_MEASUREMENT_ID
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// export const analytics = getAnalytics(app);
 export const storage = getStorage();
-export const postRef = ref(storage, "gs://frame-rate-d07b8.appspot.com/images")
+export const postRef = ref(storage, process.env.FIREBASE_IMAGEREF_URL);

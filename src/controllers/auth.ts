@@ -6,10 +6,10 @@ import {
   loginValidation,
 } from "../helpers/validation_helper.js";
 import bcrypt from "bcryptjs";
-// import jwt from "jsonwebtoken";
 import {
   signAccessToken,
   signRefreshToken,
+  verifyAccessToken,
   verifyRefreshToken,
 } from "../helpers/init_jwt.js";
 import createError from "http-errors";
@@ -39,9 +39,9 @@ authRoute.post("/register", async (req, res) => {
   });
   try {
     const savedUser = await user.save();
-    const accessToken = await signAccessToken(savedUser.id);
-    const refreshToken = await signRefreshToken(savedUser.id);
-    res.send({ accessToken, refreshToken });
+    // const accessToken = await signAccessToken(savedUser.id);
+    // const refreshToken = await signRefreshToken(savedUser.id);
+    res.send({ user }); //, accessToken, refreshToken });
   } catch (err) {
     res.status(400).send(err);
   }
@@ -75,7 +75,6 @@ authRoute.post("/refresh-token", async (req, res, next) => {
       throw createError.BadRequest();
     }
     const userId = await verifyRefreshToken(refreshToken);
-
     const accessToken = await signAccessToken(userId);
     const refreshToken2 = await signRefreshToken(userId);
     res.send({ accessToken, refreshToken: refreshToken2 });
@@ -84,7 +83,7 @@ authRoute.post("/refresh-token", async (req, res, next) => {
   }
 });
 
-authRoute.delete("/logout", async (req, res, next) => {
+authRoute.delete("/logout", verifyAccessToken, async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
     if (!refreshToken) {
@@ -101,7 +100,7 @@ authRoute.delete("/logout", async (req, res, next) => {
         res.sendStatus(204);
       } else if (val == 0) {
         console.log("Unauthorized");
-        res.sendStatus(401)
+        res.sendStatus(401);
       }
     });
   } catch (err) {

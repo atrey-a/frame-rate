@@ -28,7 +28,7 @@ postRoute.delete("/:id", verifyAccessToken, async (req, res) => {
   }
 });
 
-postRoute.put("/:id/like", verifyAccessToken, async (req, res) => {
+postRoute.put("/like/:id", verifyAccessToken, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post.likes.includes(req.body.userId)) {
@@ -36,20 +36,50 @@ postRoute.put("/:id/like", verifyAccessToken, async (req, res) => {
       res.status(200).json("Liked.");
     } else {
       await post.updateOne({ $pull: { likes: req.body.userId } });
+      res.status(200).json("Like Removed.");
     }
   } catch (err) {
     res.send(500).json(err);
   }
 });
 
-postRoute.get("/feed/:pg", verifyAccessToken, (req, res) => {
+postRoute.get("/likes/:id", verifyAccessToken, async (req,res) => {
   try {
-    const currentUser = User.findById(req.body.userId)
-    const posts = Post.find({
-      userId: {$in : currentUser['following']}
-    }).getFilter().sort({ createdAt: -1}).limit(10)
+    const post = await Post.findById(req.params.id);
+    const nlikes = post.likes.length
+    res.send({
+      likes: nlikes
+    })
   } catch (err) {
     res.send(500).json(err);
   }
-});
+})
 
+postRoute.get("/flikes/:id", verifyAccessToken, async (req,res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    const user = await User.findById(req.body.userId);
+    const isFollowing = (userId) => (user.following.includes(userId));
+    const nlikes = post.likes.filter(isFollowing).length
+    res.send({
+      likes: nlikes
+    })
+  } catch (err) {
+    res.send(500).json(err);
+  }
+})
+
+postRoute.put("/save/:id", verifyAccessToken, async (req,res) => {
+  try {
+    const user = await User.findById(req.body.userId);
+    if (!user.saved.includes(req.params.id)) {
+      await user.updateOne({ $push : {saved: req.params.id}});
+      res.status(200).json("Saved.")
+    } else {
+      await user.updateOne({ $pull : {saved: req.params.id}});
+      res.status(200).json("Unsaved.")
+    }
+  } catch (err) {
+    res.send(500).json(err);
+  }
+})

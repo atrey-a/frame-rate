@@ -1,27 +1,49 @@
 import express from "express";
 import multer from "multer";
-import { firebaseConfig, storage, app, postRef } from "../helpers/init_firebase.js";
+import {
+  firebaseConfig,
+  storage,
+  app,
+  // analytics,
+  postRef,
+} from "../helpers/init_firebase.js";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
+import { verifyAccessToken } from "../helpers/init_jwt.js";
 
-const fileRouter = express.Router();
+export const fileRoute = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-fileRouter.post('/upload', upload.single('filename'), async (req,res) => {
+fileRoute.post("/new", verifyAccessToken, upload.single("filename"), async (req, res) => {
   try {
-    console.log("Uploading Image...")
+    console.log("Uploading Image...");
+    const timeMs = Date.now();
     const file = req.file;
-    if (file) {
-      uploadBytesResumable(postRef, file).then((success) => {
-        res.status(200).send({
-          status: "Success!"
-        })
-      })
-    }
+    const storageRef = ref(
+      storage,
+      `files/${req.file.originalname + " " + timeMs}`
+    );
+    const metadata = {
+      contentType: req.file.mimetype,
+    };
+    const img = await uploadBytesResumable(
+      storageRef,
+      req.file.buffer,
+      metadata
+    );
+    const img_url = await getDownloadURL(img.ref);
+    console.log("Uploaded Image.");
+    return res.send({
+      imageUrl: img_url,
+    });
   } catch (err) {
-    console.log(err.message)
+    console.log(err.message);
   }
+});
+
+fileRoute.get(":/id", verifyAccessToken, async (req,res) => {
+  
 })
 
-fileRouter.get('/download')
+fileRoute.delete("/:id", verifyAccessToken, async (req, res) => {
 
-fileRouter.delete('/delete')
+});
