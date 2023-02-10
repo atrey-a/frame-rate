@@ -39,11 +39,3 @@ fileRoute.post("/new", verifyAccessToken, upload.single("filename"), async (req,
     console.log(err.message);
   }
 });
-
-fileRoute.get(":/id", verifyAccessToken, async (req,res) => {
-  
-})
-
-fileRoute.delete("/:id", verifyAccessToken, async (req, res) => {
-
-});

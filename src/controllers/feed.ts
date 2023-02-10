@@ -4,13 +4,21 @@ import { verifyAccessToken } from "../helpers/init_jwt.js";
 import { Post } from "../models/Post.js";
 import { User } from "../models/User.js";
 
-feedRoute.get("/:pg", verifyAccessToken, (req, res) => {
+const postsPerPage = 10;
+
+feedRoute.get("/:pg", verifyAccessToken, async (req, res) => {
   try {
-    const currentUser = User.findById(req.body.userId)
+    const user = await User.findById(req.body.userId);
+    const followingUsers = user.following;
     const posts = Post.find({
-      userId: {$in : currentUser['following']}
-    }).getFilter().sort({ createdAt: -1}).limit(10)
+      userId: { $in: followingUsers },
+    })
+      .getFilter()
+      .sort({ createdAt: -1 })
+      .slice((req.params.pg - 1) * postsPerPage, req.params.pg * postsPerPage);
+    res.send({ posts });
+    return;
   } catch (err) {
-    res.send(500).json(err);
+    res.status(500).json(err);
   }
 });
