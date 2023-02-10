@@ -1,6 +1,6 @@
 import Router from "express";
 export const authRoute = Router.Router();
-import { User } from "../model/User.js";
+import { User } from "../models/User.js";
 import {
   registerValidation,
   loginValidation,
@@ -11,8 +11,9 @@ import {
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
-} from "../helpers/jwt_helper.js";
+} from "../helpers/init_jwt.js";
 import createError from "http-errors";
+import { client } from "../helpers/init_redis.js";
 
 authRoute.post("/register", async (req, res) => {
   //Validate data before User
@@ -64,7 +65,7 @@ authRoute.post("/login", async (req, res) => {
 
   const accessToken = await signAccessToken(user.id);
   const refreshToken = await signRefreshToken(user.id);
-  res.send({ accessToken, refreshToken });
+  res.send({ user, accessToken, refreshToken });
 });
 
 authRoute.post("/refresh-token", async (req, res, next) => {
@@ -85,12 +86,25 @@ authRoute.post("/refresh-token", async (req, res, next) => {
 
 authRoute.delete("/logout", async (req, res, next) => {
   try {
-    const {refreshToken} = req.body
+    const { refreshToken } = req.body;
     if (!refreshToken) {
-      throw createError.BadRequest()
+      throw createError.BadRequest();
     }
-    const userId = await verifyRefreshToken(refreshToken)
+    const userId = await verifyRefreshToken(refreshToken);
+    client.del(userId, (err, val) => {
+      if (err) {
+        console.log(err.message);
+        throw createError.InternalServerError();
+      }
+      if (val == 1) {
+        console.log(`Logged out user with userID: ${userId}`);
+        res.sendStatus(204);
+      } else if (val == 0) {
+        console.log("Unauthorized");
+        res.sendStatus(401)
+      }
+    });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });

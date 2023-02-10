@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Post } from "./Post.js";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -23,6 +24,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  followers: {
+    type:Array,
+    default: []
+  },
+  following: {
+    type:Array,
+    default: []
+  },
+  posts: {
+    type: Array<typeof Post>,
+    default: []
+  }
 });
 
 export const User = mongoose.model("User", userSchema);

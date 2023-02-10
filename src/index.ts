@@ -4,20 +4,21 @@ import dotenv from "dotenv";
 dotenv.config();
 import "./helpers/init_mongo.js";
 import createError from "http-errors";
-import { verifyAccessToken } from "./helpers/jwt_helper.js";
-import { client } from "./helpers/init_redis.js";
+import { verifyAccessToken } from "./helpers/init_jwt.js";
+import "./helpers/init_redis.js";
 
 //Import Routes
-import { authRoute } from "./routes/auth.js";
-import { postRoute } from "./routes/posts.js";
+import { authRoute } from "./controllers/auth.js";
+import { postRoute } from "./controllers/posts.js";
+import { userRoute } from "./controllers/users.js";
 
 //Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-//Route Middlewares
-app.use("/api/auth", authRoute);
-app.use("/api/posts", postRoute);
+app.use("/auth", authRoute);
+app.use("/post", postRoute);
+app.use("/user", userRoute);
 
 app.get("/", verifyAccessToken, async (req, res, next) => {
   res.send("Hello from Express.");

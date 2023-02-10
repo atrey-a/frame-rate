@@ -1,13 +1,13 @@
-import {createClient} from 'redis'
+import redis from 'redis'
+export const client = redis.createClient();
 
-// export const client = (process.env.REDIS_URL) ? createClient({url: process.env.REDIS_URL}) : createClient();
-export const client = createClient();
+// (async () => {
+//   await client.connect();
+// })();
 
-await client.connect()
-
-client.on('connect', () => {
+client.on("ready", () => {
   console.log("Connected to Redis!");
-})
+});
 
 client.on('ready', () => {
   console.log("Redis is Ready!");
@@ -18,7 +18,7 @@ client.on('error', (err) => {
 })
 
 client.on('end', () => {
-  console.log("Disconnected from Redis!")
+  console.log("\nDisconnected from Redis!")
 })
 
 process.on('SIGINT', () => {

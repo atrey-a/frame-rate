@@ -1,12 +1,13 @@
 import jwt from "jsonwebtoken";
 import createError from "http-errors";
+import { client } from "./init_redis.js";
 
 export const signAccessToken = (userId) => {
   return new Promise((resolve, reject) => {
     const payload = {};
     const secret = process.env.ACCESS_SECRET_TOKEN;
     const options = {
-      expiresIn: "20s",
+      expiresIn: "1h",
       issuer: "frame-rate.com",
       audience: userId,
     };
@@ -51,6 +52,16 @@ export const signRefreshToken = (userId) => {
         console.log(err.message);
         return reject(createError.InternalServerError());
       }
+
+      client.set(userId, token, "EX", 365 * 24 * 60 * 60, (err, reply) => {
+        if (err) {
+          console.log(err.message);
+          reject(createError.InternalServerError());
+          return;
+        }
+        resolve(token);
+      });
+
       resolve(token);
     });
   });
@@ -66,6 +77,17 @@ export const verifyRefreshToken = (refreshToken) => {
           return reject(createError.Unauthorized());
         }
         const userId = payload.aud;
+
+        client.get(userId, (err, res) => {
+          if (err) {
+            console.log(err.message);
+            reject(createError.InternalServerError());
+            return;
+          }
+          if (refreshToken === res) return resolve(userId);
+          reject(createError.Unauthorized());
+        });
+
         resolve(userId);
       }
     );
