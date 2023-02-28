@@ -1,8 +1,9 @@
 import Router from "express";
 export const userRoute = Router.Router();
 import { User } from "../models/User.js";
+import { verifyAccessToken } from "../helpers/init_jwt.js";
 
-userRoute.put("/follow/:id", async (req, res) => {
+userRoute.put("/follow/:id", verifyAccessToken, async (req, res) => {
   if (req.body.userId !== req.params.id) {
     try {
       const user = await User.findById(req.params.id);
@@ -22,7 +23,7 @@ userRoute.put("/follow/:id", async (req, res) => {
   }
 });
 
-userRoute.put("/unfollow/:id", async (req, res) => {
+userRoute.put("/unfollow/:id", verifyAccessToken, async (req, res) => {
     if (req.body.userId !== req.params.id) {
       try {
         const user = await User.findById(req.params.id);

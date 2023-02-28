@@ -18,7 +18,7 @@ npm run start
 
 ## API Description
 
-| Functionality | Request | Endpoint | Body | Auth | Return |
+| Functionality | Method | Endpoint | Body | Auth | Return |
 |---------------|---------|----------|------|:----:|--------|
 |Register a new user|POST|`/auth/register`|\<userSchema\>|-|\<userSchema\>|
 |Login a registered user|POST|`/auth/login`|\<userSchema\>|-|\<userSchema\>,\<tokens\>|
@@ -27,7 +27,7 @@ npm run start
 |Follow a user|PUT|`/user/follow/{userId}`|\<userId\>|Bearer \<accessToken\>|-|
 |Unfollow a user|PUT|`/user/unfollow/{userId}`|\<userId\>|Bearer \<accessToken\>|-|
 |Upload an Image|POST|`/file/new`|\<userId\>|Bearer \<accessToken\>|\<imageId\>|
-|Get an Image|GET|`/file/{imageId}`|\<userId\>|Bearer \<accessToken\>|/<imageUrl/>|
+|Get an Image|GET|`/file/{imageId}`|\<userId\>|Bearer \<accessToken\>|\<imageUrl\>|
 |Delete an Image|DELETE|`/file/{imageId}`|\<userId\>|Bearer \<accessToken\>|-|
 |Create a post|POST|`/post/new`|\<postSchema\>|Bearer \<accessToken\>|\<postSchema\>|
 |Delete a post|DELETE|`/post/{postId}`|\<userId\>|Bearer \<accessToken\>|-|
